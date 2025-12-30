@@ -90,7 +90,7 @@ export function Settings({ settings, onUpdateSettings }: SettingsProps) {
                         <Image weight="duotone" className="w-6 h-6" />
                         <h3 className="text-lg font-bold">Wallpaper</h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {WALLPAPERS.map((wp) => (
                             <button
                                 key={wp.id}

@@ -89,7 +89,7 @@ function App() {
       <div className="absolute inset-0 z-0 bg-transparent" />
 
       {/* Main Layout Grid */}
-      <div className="relative z-10 flex h-full p-6 gap-6">
+      <div className="relative z-10 flex flex-col md:flex-row h-full p-4 md:p-6 gap-4 md:gap-6">
         <Sidebar
           activeView={activeView}
           onNavigate={setActiveView}

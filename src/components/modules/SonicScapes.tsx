@@ -50,11 +50,11 @@ export function SonicScapes({
     const currentTrack = playlist[currentTrackIndex];
 
     return (
-        <div className="flex h-full gap-6 text-white overflow-hidden relative">
+        <div className="flex flex-col md:flex-row h-full gap-6 text-white overflow-hidden relative">
             <div className="absolute top-0 left-0 right-0 h-40 glossy-overlay opacity-30 pointer-events-none rounded-t-3xl z-0" />
 
             {/* Playlist Sidebar */}
-            <div className="w-1/3 flex flex-col gap-4 relative z-10">
+            <div className="w-full md:w-1/3 flex flex-col gap-4 relative z-10 h-1/3 md:h-auto shrink-0">
                 <div className="glass-panel p-4 rounded-2xl flex-1 flex flex-col overflow-hidden bg-black/20 border border-white/10">
                     <div className="flex items-center justify-between mb-4 px-2">
                         <h2 className="text-lg font-bold flex items-center gap-2 text-white/90">

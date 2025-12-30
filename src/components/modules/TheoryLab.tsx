@@ -287,7 +287,7 @@ export function TheoryLab() {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 justify-end">
                     {/* Trainer Controls */}
                     <div className="flex bg-black/20 rounded-lg p-1 border border-white/10 items-center gap-2">
                         {/* Opening Selector */}
@@ -409,10 +409,10 @@ export function TheoryLab() {
             )}
 
             {/* Main Content */}
-            <div className="flex-1 flex gap-6 relative z-20 min-h-0 w-full overflow-hidden">
+            <div className="flex-1 flex flex-col md:flex-row gap-6 relative z-20 min-h-0 w-full overflow-hidden">
                 {/* Board */}
                 <div className="flex-1 flex items-center justify-center min-h-0">
-                    <div className="aspect-square h-full max-h-[80vh] glass-panel p-4 rounded-2xl bg-black/20 overflow-hidden shadow-2xl border border-white/30 relative flex items-center justify-center">
+                    <div className="aspect-square h-full max-h-[50vh] md:max-h-[80vh] glass-panel p-4 rounded-2xl bg-black/20 overflow-hidden shadow-2xl border border-white/30 relative flex items-center justify-center">
                         <div className="w-full h-full">
                             <Chessboard
                                 key={boardKey}
@@ -428,7 +428,7 @@ export function TheoryLab() {
                 </div>
 
                 {/* History */}
-                <div className="w-64 glass-panel rounded-2xl bg-black/20 border border-white/10 flex flex-col overflow-hidden">
+                <div className="w-full md:w-64 glass-panel rounded-2xl bg-black/20 border border-white/10 flex flex-col overflow-hidden flex-shrink-0 h-48 md:h-auto">
                     <div className="p-3 border-b border-white/10 bg-white/5 flex justify-between items-center">
                         <h4 className="text-white/80 text-sm font-medium">Move List</h4>
                         <span className="text-[10px] text-white/40 uppercase tracking-wider">{history.length} Plies</span>

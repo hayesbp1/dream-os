@@ -136,7 +136,7 @@ export function Library() {
 
                                 <div className="flex flex-col gap-3">
                                     {/* Top Row: Icon + Title + Metadata */}
-                                    <div className="flex items-start justify-between">
+                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-0">
                                         <div className="flex items-center gap-3">
                                             {/* Cover or Icon */}
                                             <div className="relative shrink-0">
@@ -161,7 +161,7 @@ export function Library() {
                                             </div>
                                         </div>
 
-                                        <div className="text-right shrink-0">
+                                        <div className="flex justify-between w-full md:w-auto md:block md:text-right shrink-0 items-end">
                                             <div className="text-white/70 text-sm font-medium">
                                                 Page {book.currentPage} of {book.totalPages}
                                             </div>
