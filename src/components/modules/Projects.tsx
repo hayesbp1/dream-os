@@ -52,7 +52,7 @@ function TaskItem({ task, projectId, onToggle, onDelete }: TaskItemProps) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
-            ref={drag}
+            ref={drag as unknown as React.RefObject<HTMLDivElement>}
             className={cn(
                 "group flex items-start gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-grab active:cursor-grabbing relative",
                 isDragging ? "opacity-50" : "opacity-100",
@@ -116,7 +116,7 @@ function ProjectColumn({
     }), [project.id, onMoveTask]);
 
     return (
-        <div ref={drop} className="break-inside-avoid mb-6 relative">
+        <div ref={drop as unknown as React.RefObject<HTMLDivElement>} className="break-inside-avoid mb-6 relative">
             <AnimatePresence>
                 {isOver && (
                     <motion.div
