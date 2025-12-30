@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Default Variables - Mapped to "Deep Teal" initially or overwritten by JS */
+    --bg-image: radial-gradient(at 0% 0%, rgba(103, 232, 249, 0.7) 0, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(15, 118, 110, 1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(45, 212, 191, 0.6) 0, transparent 50%);
+    --bg-color: #006994;
+    --glass-blur: 16px;
+    --glass-opacity: 0.2;
+    --glass-border: 0.4;
+    --glass-rgb: 255, 255, 255;
+    /* Default Date (White) */
+  }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /*--- THE DREAM OS GRADIENT ---*/
+    min-height: 100vh;
+
+    background-color: var(--bg-color);
+    background-image: var(--bg-image);
+    background-attachment: fixed;
+    background-size: cover;
+    transition: background-image 0.5s ease-in-out, background-color 0.5s ease;
+  }
+}
+
+@layer components {
+
+  /* Extreme Glassmorphism */
+  .glass-panel {
+    backdrop-filter: blur(var(--glass-blur));
+    background-color: rgba(var(--glass-rgb), var(--glass-opacity));
+    border: 1px solid rgba(255, 255, 255, var(--glass-border));
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Glossy Highlight */
+  .glossy-overlay {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+  }
+
+  /* 3D Icon Container */
+  .icon-3d {
+    @apply relative flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-white/40 to-white/10 shadow-lg border border-white/50;
+  }
+}
