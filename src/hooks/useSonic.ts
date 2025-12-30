@@ -214,6 +214,7 @@ export function useSonic() {
         handleFileUpload,
         handleSeek,
         setIsPlaying,
-        setCurrentTrackIndex
+        setCurrentTrackIndex,
+        audioRef
     };
 }

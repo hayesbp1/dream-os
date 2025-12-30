@@ -97,7 +97,7 @@ export function Library() {
 
     return (
         <>
-            <div className="glass-panel p-6 rounded-3xl h-full flex flex-col relative overflow-hidden">
+            <div className="glass-panel p-6 rounded-3xl h-full flex flex-col relative overflow-hidden bg-black/20 border border-white/10">
                 <div className="absolute top-0 left-0 right-0 h-20 glossy-overlay opacity-40 pointer-events-none" />
 
                 <div className="flex items-center justify-between mb-6 relative z-10">

@@ -1,3 +1,11 @@
 [
-    { "id": "1", "title": "aquatic ambience", "artist": "scizzie", "url": "/music/aquatic-ambience.mp3" }
+    { "id": "1", 
+      "title": "aquatic ambience", 
+      "artist": "scizzie", 
+      "url": "/music/aquatic-ambience.mp3" },
+      
+    { "id": "2", 
+      "title": "resonance", 
+      "artist": "home", 
+      "url": "/music/resonance.mp3" }
 ]

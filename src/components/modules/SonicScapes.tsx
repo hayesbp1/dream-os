@@ -1,5 +1,6 @@
 import { useRef, type ChangeEvent } from 'react';
-import { Play, Pause, SkipForward, SkipBack, SpeakerHigh, SpeakerX, MusicNotes, UploadSimple, VinylRecord } from '@phosphor-icons/react';
+import { Play, Pause, SkipForward, SkipBack, SpeakerHigh, SpeakerX, UploadSimple, VinylRecord } from '@phosphor-icons/react';
+import { Visualizer } from './Visualizer';
 import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import type { Track } from '../../types';
@@ -19,6 +20,7 @@ interface SonicScapesProps {
     handleSeek: (time: number) => void;
     setIsPlaying: (playing: boolean) => void;
     setCurrentTrackIndex: (index: number) => void;
+    audioRef: React.RefObject<HTMLAudioElement | null>;
 }
 
 export function SonicScapes({
@@ -35,7 +37,8 @@ export function SonicScapes({
     handleFileUpload,
     handleSeek,
     setIsPlaying,
-    setCurrentTrackIndex
+    setCurrentTrackIndex,
+    audioRef,
 }: SonicScapesProps) {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,8 +60,10 @@ export function SonicScapes({
             <div className="w-full md:w-1/3 flex flex-col gap-4 relative z-10 h-1/3 md:h-auto shrink-0">
                 <div className="glass-panel p-4 rounded-2xl flex-1 flex flex-col overflow-hidden bg-black/20 border border-white/10">
                     <div className="flex items-center justify-between mb-4 px-2">
-                        <h2 className="text-lg font-bold flex items-center gap-2 text-white/90">
-                            <MusicNotes weight="duotone" className="w-5 h-5 text-purple-400" />
+                        <h2 className="text-lg font-bold flex items-center gap-3 text-white/90">
+                            <div className="p-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
+                                <VinylRecord weight="duotone" className="w-5 h-5 text-white" />
+                            </div>
                             Library
                         </h2>
                         <button
@@ -151,10 +156,16 @@ export function SonicScapes({
                             "w-48 h-48 rounded-2xl bg-gradient-to-br from-gray-800 to-black border-2 border-white/10 flex items-center justify-center shadow-2xl relative overflow-hidden",
                             isPlaying && "animate-pulse"
                         )}>
-                            <VinylRecord weight="duotone" className={cn("w-24 h-24 text-white/20", isPlaying && "animate-spin-slow")} />
+                            {isPlaying ? (
+                                <div className="absolute inset-0 w-full h-full opacity-90">
+                                    <Visualizer audioRef={audioRef} />
+                                </div>
+                            ) : (
+                                <VinylRecord weight="duotone" className={cn("w-24 h-24 text-white/20")} />
+                            )}
 
-                            {/* Glass Shine */}
-                            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+                            {/* Glass Shine Overlay */}
+                            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none z-20" />
                         </div>
                     </motion.div>
 
@@ -225,7 +236,7 @@ export function SonicScapes({
                         />
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

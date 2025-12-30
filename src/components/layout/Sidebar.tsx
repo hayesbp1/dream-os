@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { Cpu, Folder, Books, Brain, PaperPlaneRight, SpeakerHigh, Calendar, Gear } from '@phosphor-icons/react';
+import { Folder, Books, Brain, PaperPlaneRight, VinylRecord, Calendar, Gear } from '@phosphor-icons/react';
 import { cn } from '../../lib/utils';
 import { useGuardian } from '../../hooks/useGuardian';
+import { GuardianHypercube } from '../GuardianHypercube';
 import type { EnergyState } from '../modules/FlowDispatcher';
 
-import type { Project } from '../../types';
+import type { Project, SystemSettings } from '../../types';
 
 type View = 'theory' | 'library' | 'projects' | 'sonic' | 'temporal' | 'settings';
 
@@ -15,14 +16,15 @@ export interface SidebarProps {
     onToggleGuardian: () => void;
     energy: EnergyState;
     projects: Project[];
+    settings: SystemSettings;
 }
 
-export function Sidebar({ activeView, onNavigate, guardianOpen, onToggleGuardian, energy, projects }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate, guardianOpen, onToggleGuardian, energy, projects, settings }: SidebarProps) {
     const navItems = [
         { id: 'projects', label: 'Projects', icon: Folder },
         { id: 'theory', label: 'Theory Lab', icon: Brain },
         { id: 'library', label: 'Library', icon: Books },
-        { id: 'sonic', label: 'Sonic Scapes', icon: SpeakerHigh },
+        { id: 'sonic', label: 'Sonic Scapes', icon: VinylRecord },
 
         { id: 'temporal', label: 'Temporal', icon: Calendar },
         { id: 'settings', label: 'Settings', icon: Gear },
@@ -56,11 +58,11 @@ export function Sidebar({ activeView, onNavigate, guardianOpen, onToggleGuardian
                 >
                     <div className="absolute top-0 left-0 right-0 h-1/2 glossy-overlay opacity-60 pointer-events-none" />
                     <div className={cn(
-                        "w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-green-400 shadow-inner flex items-center justify-center border-2 border-white/60 relative z-10 transition-all",
-                        guardianOpen ? "box-shadow-glow" : "grayscale opacity-80",
+                        "w-14 h-14 rounded-full shadow-inner overflow-hidden border-2 border-white/40 relative z-10 transition-all",
+                        guardianOpen ? "bg-black/40 box-shadow-glow" : "bg-black/20 grayscale opacity-80",
                         isThinking && "animate-pulse shadow-[0_0_30px_rgba(72,187,120,0.6)]"
                     )}>
-                        <Cpu weight="duotone" className={cn("text-white w-8 h-8 drop-shadow-md", isThinking && "animate-spin-slow")} />
+                        <GuardianHypercube theme={settings.theme} />
                     </div>
                     <div className="relative z-10">
                         <h2 className="text-white font-bold text-lg drop-shadow-sm font-sans tracking-wide">Guardian</h2>
@@ -152,12 +154,12 @@ export function Sidebar({ activeView, onNavigate, guardianOpen, onToggleGuardian
                 <button
                     onClick={onToggleGuardian}
                     className={cn(
-                        "absolute -top-16 right-0 w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-green-400 shadow-lg flex items-center justify-center border-2 border-white/60 transition-all active:scale-95",
+                        "absolute -top-16 right-0 w-12 h-12 rounded-full bg-black/40 backdrop-blur-md shadow-lg border-2 border-white/40 transition-all active:scale-95 overflow-hidden",
                         guardianOpen ? "box-shadow-glow" : "grayscale opacity-80",
                         isThinking && "animate-pulse shadow-[0_0_30px_rgba(72,187,120,0.6)]"
                     )}
                 >
-                    <Cpu weight="duotone" className={cn("text-white w-6 h-6", isThinking && "animate-spin-slow")} />
+                    <GuardianHypercube theme={settings.theme} />
                 </button>
 
                 <nav className="glass-panel rounded-2xl p-2 flex justify-between items-center shadow-2xl">
@@ -180,5 +182,3 @@ export function Sidebar({ activeView, onNavigate, guardianOpen, onToggleGuardian
         </>
     );
 }
-
-

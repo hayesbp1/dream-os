@@ -97,6 +97,7 @@ function App() {
           onToggleGuardian={() => setGuardianOpen(!guardianOpen)}
           energy={energy}
           projects={projects}
+          settings={settings}
         />
 
         {/* Main Content Area */}
