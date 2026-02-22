@@ -53,11 +53,11 @@ export function TemporalView({ projects, setProjects }: TemporalViewProps) {
     const addTask = () => {
         if (!newTaskText.trim() || !selectedDate) return;
 
-        // Add to the first project for now, or a "General" project if exists.
-        // Ideally user selects project, but simple first.
-        // Let's assume the first project is safe to add to, or specifically 'Dream OS Dev' or similar.
-        // Or just the first one.
-        const targetProjectId = projects[0]?.id;
+        // Default to 'misc-inbox', fallback to first project if missing
+        let targetProjectId = 'misc-inbox';
+        if (!projects.find(p => p.id === targetProjectId)) {
+            targetProjectId = projects[0]?.id;
+        }
         if (!targetProjectId) return;
 
         const newTask: Task = {
@@ -102,16 +102,18 @@ export function TemporalView({ projects, setProjects }: TemporalViewProps) {
                 </button>
             </div>
 
+            {/* Weekday Headers */}
+            <div className="grid grid-cols-7 gap-4 mb-2 shrink-0 px-1">
+                {weekDays.map(day => (
+                    <div key={day} className="text-center text-white/60 font-medium text-sm py-2">
+                        {day}
+                    </div>
+                ))}
+            </div>
+
             {/* Grid */}
             <div className="flex-1 overflow-y-auto min-h-0">
-                <div className="grid grid-cols-7 gap-4 h-full auto-rows-fr">
-                    {/* Weekday Headers */}
-                    {weekDays.map(day => (
-                        <div key={day} className="text-center text-white/60 font-medium text-sm py-2">
-                            {day}
-                        </div>
-                    ))}
-
+                <div className="grid grid-cols-7 gap-4 h-full auto-rows-fr p-1">
                     {/* Days */}
                     {calendarDays.map((day: Date) => {
                         const isCurrentMonth = isSameMonth(day, monthStart);

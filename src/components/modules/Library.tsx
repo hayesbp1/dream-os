@@ -14,22 +14,13 @@ interface Book {
     cover?: string;
 }
 
-const INITIAL_BOOKS: Book[] = [
-    {
-        id: 1,
-        title: 'Linear Algebra Done Right',
-        author: 'Axler',
-        currentPage: 0,
-        totalPages: 350,
-        filePath: `/books/linear-algebra.pdf`
-    },
-];
+const pdfFiles = import.meta.glob('../../assets/books/*.pdf', { as: 'url', eager: true });
 
 export function Library() {
-    // Initialize from localStorage if available, else default
+    // Initialize from localStorage if available, but allow merging new files later
     const [books, setBooks] = useState<Book[]>(() => {
         const saved = localStorage.getItem('dreamOS_library_books');
-        return saved ? JSON.parse(saved) : INITIAL_BOOKS;
+        return saved ? JSON.parse(saved) : [];
     });
 
     const [isScanning, setIsScanning] = useState(false);
@@ -39,6 +30,13 @@ export function Library() {
     useEffect(() => {
         localStorage.setItem('dreamOS_library_books', JSON.stringify(books));
     }, [books]);
+
+    // Initial scan to populate empty library or legacy paths
+    useEffect(() => {
+        if (books.length === 0) {
+            scanBooks();
+        }
+    }, []);
 
     const updateProgress = (id: number) => {
         const book = books.find(b => b.id === id);
@@ -65,28 +63,82 @@ export function Library() {
         setIsScanning(true);
 
         try {
-            // Process all books in parallel
-            const updatedBooks = await Promise.all(books.map(async (book) => {
+            // Get all available files from assets
+
+            // Map the glob results to a list of potential books
+            const fileEntries = Object.entries(pdfFiles).map(([path, url]) => {
+                // path is relative like ../../assets/books/filename.pdf
+                // Extract filename
+                const filename = path.split('/').pop() || 'Unknown Book';
+                // Create a readable title from filename (remove extension, replace dashes/underscores)
+                const title = filename.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ');
+
+                return {
+                    filePath: url as string,
+                    defaultTitle: title,
+                    filename: filename
+                };
+            });
+
+            // Process existing books + new files
+            // 1. Identify new files that aren't in the current 'books' state
+            // matching by checking if existing books have the same filePath (or roughly same)
+            // Note: imported URLs might change with builds, so we should likely rely on filename if possible,
+            // but for now, let's use the full relative path key if we could, OR just the resolved URL.
+            // A simple way is to check if any existing book has this URL. 
+            // Better: Re-build the book list based on files found, preserving progress for matching titles.
+
+            const newBookList: Book[] = [];
+            let nextId = Math.max(0, ...books.map(b => b.id)) + 1;
+
+            for (const entry of fileEntries) {
+                // Check if we already have this book (by title primarily, as URL might change hash)
+                // If title matches, keep the progress.
+                // We'll trust the default title derived from filename for initial matching.
+
+                // Note: Metadata title might be different. 
+                // Let's use the filename-derived title as a stable key effectively if scanning fresh.
+
+                // Better approach:
+                // Scan metadata for the file. 
+                // If we find a book in our state with the SAME TITLE, preserve its progress.
+                // If not, create new.
+
                 const [metadata, cover] = await Promise.all([
-                    getPDFMetadata(book.filePath),
-                    getPDFCover(book.filePath)
+                    getPDFMetadata(entry.filePath),
+                    getPDFCover(entry.filePath)
                 ]);
 
-                // Only update if we successfully got page count
-                if (metadata.numPages > 0) {
-                    return {
-                        ...book,
-                        totalPages: metadata.numPages,
-                        // Update title/author if found, otherwise keep existing
-                        title: metadata.title || book.title,
-                        author: metadata.author || book.author,
-                        cover: cover || book.cover
-                    };
-                }
-                return book;
-            }));
+                const finalTitle = metadata.title || entry.defaultTitle;
+                const finalAuthor = metadata.author || 'Unknown Author';
 
-            setBooks(updatedBooks);
+                // Look for existing book to preserve progress
+                // Check by title OR by fuzzy filename match if we had that stored.
+                // For simplicity, we match by Title.
+                const existingBook = books.find(b => b.title === finalTitle || b.title === entry.defaultTitle);
+
+                if (existingBook) {
+                    newBookList.push({
+                        ...existingBook,
+                        filePath: entry.filePath, // Update URL in case build hash changed
+                        totalPages: metadata.numPages > 0 ? metadata.numPages : existingBook.totalPages,
+                        cover: cover || existingBook.cover,
+                        author: finalAuthor !== 'Unknown Author' ? finalAuthor : existingBook.author
+                    });
+                } else {
+                    newBookList.push({
+                        id: nextId++,
+                        title: finalTitle,
+                        author: finalAuthor,
+                        currentPage: 0,
+                        totalPages: metadata.numPages,
+                        filePath: entry.filePath,
+                        cover: cover || undefined
+                    });
+                }
+            }
+
+            setBooks(newBookList);
         } catch (error) {
             console.error("Failed to scan books:", error);
             alert("An error occurred while scanning books.");

@@ -123,15 +123,15 @@ function ProjectColumn({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-10 bg-blue-500/10 rounded-3xl border-2 border-blue-500/30 backdrop-blur-[1px] pointer-events-none"
+                        className="absolute inset-0 z-10 bg-white/10 rounded-3xl border-2 border-white/20 backdrop-blur-[1px] pointer-events-none"
                     />
                 )}
             </AnimatePresence>
 
-            <GlassCard className="flex flex-col gap-4 group/card" hoverEffect>
+            <GlassCard className="flex flex-col gap-3 group/card !p-5" hoverEffect>
                 {/* Project Header */}
                 <div className="flex items-center gap-3 border-b border-white/10 pb-3 relative">
-                    <div className="p-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                    <div className="p-2 rounded-lg bg-white/10 text-white/90 border border-white/20">
                         <Folder weight="duotone" className="w-5 h-5" />
                     </div>
 
@@ -142,7 +142,7 @@ function ProjectColumn({
                             onChange={(e) => onSetEditName(e.target.value)}
                             onBlur={() => onSaveName(project.id)}
                             onKeyDown={(e) => e.key === 'Enter' && onSaveName(project.id)}
-                            className="bg-transparent border-b border-blue-400 text-white font-bold text-lg focus:outline-none w-full"
+                            className="bg-transparent border-b border-white/50 text-white font-bold text-lg focus:outline-none w-full"
                             autoFocus
                         />
                     ) : (
@@ -332,105 +332,149 @@ export function Projects({ energy, setEnergy, projects, setProjects }: ProjectsP
         }
     };
 
+    const mainProjects = projects.filter(p => p.id !== 'misc-inbox');
+    const inboxProject = projects.find(p => p.id === 'misc-inbox') || { id: 'misc-inbox', name: 'Inbox', tasks: [] };
+
+    // Ensure inbox exists if it was somehow missing from filtering
+    useEffect(() => {
+        if (!projects.find(p => p.id === 'misc-inbox')) {
+            // We won't auto-create here to avoid infinite loops with setProjects, 
+            // assuming App.tsx handles it. Use the fallback object for read-only render if needed.
+        }
+    }, [projects]);
+
+
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className="h-full flex flex-col gap-6">
-                {/* Input Console */}
-                <div className="flex-shrink-0 flex flex-col gap-3 z-20">
-                    {/* Project Selector Pills */}
-                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none items-center">
-                        {projects.map(p => (
-                            <button
-                                key={p.id}
-                                onClick={() => setSelectedProjectId(p.id)}
-                                className={cn(
-                                    "px-3 py-1.5 rounded-full text-xs font-mono transition-all border whitespace-nowrap",
-                                    selectedProjectId === p.id
-                                        ? "bg-blue-500/30 text-white border-blue-400/50 shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-                                        : "bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white/80"
-                                )}
-                            >
-                                {p.name}
-                            </button>
-                        ))}
+            <div className="h-full flex gap-6">
 
-                        {/* New Project Button / Input */}
-                        {isCreatingProject ? (
-                            <div className="flex items-center bg-white/10 rounded-full border border-white/20 px-2 py-0.5 animate-in fade-in slide-in-from-left-2 duration-200">
+                {/* LEFT: Main Projects Area */}
+                <div className="flex-1 flex flex-col gap-6 min-w-0">
+
+                    {/* Input Console (Restricted to Left Side) */}
+                    <div className="flex-shrink-0 flex flex-col gap-3 z-20">
+                        {/* Project Selector Pills */}
+                        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none items-center">
+                            {mainProjects.map(p => (
+                                <button
+                                    key={p.id}
+                                    onClick={() => setSelectedProjectId(p.id)}
+                                    className={cn(
+                                        "px-3 py-1.5 rounded-full text-xs font-mono transition-all border whitespace-nowrap",
+                                        selectedProjectId === p.id
+                                            ? "bg-white/20 text-white border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.15)]"
+                                            : "bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white/80"
+                                    )}
+                                >
+                                    {p.name}
+                                </button>
+                            ))}
+
+                            {/* New Project Button */}
+                            {isCreatingProject ? (
+                                <div className="flex items-center bg-white/10 rounded-full border border-white/20 px-2 py-0.5 animate-in fade-in slide-in-from-left-2 duration-200">
+                                    <input
+                                        ref={newProjectInputRef}
+                                        type="text"
+                                        value={newProjectName}
+                                        onChange={(e) => setNewProjectName(e.target.value)}
+                                        onKeyDown={handleProjectInputKeyDown}
+                                        onBlur={handleCreateProject}
+                                        placeholder="Project Name..."
+                                        className="bg-transparent border-none text-white text-xs font-mono focus:ring-0 focus:outline-none w-32 placeholder-white/30"
+                                    />
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setIsCreatingProject(true)}
+                                    className="p-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                                    title="Create New Project"
+                                >
+                                    <Plus weight="duotone" className="w-3.5 h-3.5" />
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="relative group">
+                            <div className="absolute -inset-0.5 bg-white/20 rounded-xl opacity-30 group-hover:opacity-50 transition duration-500 blur-sm"></div>
+                            <div className="relative glass-panel rounded-xl p-1 flex items-center">
+                                <div className="pl-4 pr-3 text-white/50">
+                                    <TerminalWindow weight="duotone" className="w-5 h-5" />
+                                </div>
                                 <input
-                                    ref={newProjectInputRef}
                                     type="text"
-                                    value={newProjectName}
-                                    onChange={(e) => setNewProjectName(e.target.value)}
-                                    onKeyDown={handleProjectInputKeyDown}
-                                    onBlur={handleCreateProject}
-                                    placeholder="Project Name..."
-                                    className="bg-transparent border-none text-white text-xs font-mono focus:ring-0 focus:outline-none w-32 placeholder-white/30"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder={selectedProjectId ? `Add task to ${projects.find(p => p.id === selectedProjectId)?.name}... (Tip: !high)` : "Select a project..."}
+                                    className="w-full bg-transparent border-none text-white placeholder-white/40 focus:ring-0 focus:outline-none py-3 font-mono text-sm tracking-wide"
+                                    autoFocus={!isCreatingProject}
+                                    disabled={!selectedProjectId}
                                 />
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setIsCreatingProject(true)}
-                                className="p-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-                                title="Create New Project"
-                            >
-                                <Plus weight="duotone" className="w-3.5 h-3.5" />
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="relative group">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-teal-500 rounded-xl opacity-30 group-hover:opacity-50 transition duration-500 blur-sm"></div>
-                        <div className="relative glass-panel rounded-xl p-1 flex items-center">
-                            <div className="pl-4 pr-3 text-white/50">
-                                <TerminalWindow weight="duotone" className="w-5 h-5" />
-                            </div>
-                            <input
-                                type="text"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                placeholder={selectedProjectId ? `Add task to ${projects.find(p => p.id === selectedProjectId)?.name}... (Tip: !high)` : "Select a project..."}
-                                className="w-full bg-transparent border-none text-white placeholder-white/40 focus:ring-0 focus:outline-none py-3 font-mono text-sm tracking-wide"
-                                autoFocus={!isCreatingProject}
-                                disabled={!selectedProjectId}
-                            />
-                            <div className="pr-2">
-                                <div className="h-6 w-6 rounded bg-white/10 flex items-center justify-center border border-white/20">
-                                    <Plus weight="duotone" className="w-4 h-4 text-white/60" />
+                                <div className="pr-2">
+                                    <div className="h-6 w-6 rounded bg-white/10 flex items-center justify-center border border-white/20">
+                                        <Plus weight="duotone" className="w-4 h-4 text-white/60" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Project Grid - MASONRY LAYOUT */}
-                <div className="flex-1 overflow-y-auto pr-2 pb-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                    <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6">
-                        <AnimatePresence>
-                            {projects.map((project) => (
-                                <ProjectColumn
-                                    key={project.id}
-                                    project={project}
-                                    editingProjectId={editingProjectId}
-                                    editProjectName={editProjectName}
-                                    onStartEdit={startEditingProject}
-                                    onSaveName={saveProjectName}
-                                    onSetEditName={setEditProjectName}
-                                    onDeleteProject={deleteProject}
-                                    onToggleTask={toggleTask}
-                                    onDeleteTask={deleteTask}
-                                    onMoveTask={moveTask}
-                                />
-                            ))}
-                        </AnimatePresence>
+                    {/* Project Grid - GRID LAYOUT */}
+                    <div className="flex-1 overflow-y-auto pr-2 pb-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xlg:grid-cols-3 gap-5 auto-rows-min">
+                            <AnimatePresence>
+                                {mainProjects.map((project) => (
+                                    <ProjectColumn
+                                        key={project.id}
+                                        project={project}
+                                        editingProjectId={editingProjectId}
+                                        editProjectName={editProjectName}
+                                        onStartEdit={startEditingProject}
+                                        onSaveName={saveProjectName}
+                                        onSetEditName={setEditProjectName}
+                                        onDeleteProject={deleteProject}
+                                        onToggleTask={toggleTask}
+                                        onDeleteTask={deleteTask}
+                                        onMoveTask={moveTask}
+                                    />
+                                ))}
+                            </AnimatePresence>
+                        </div>
                     </div>
                 </div>
 
-                {/* System Status / Flow Dispatcher */}
-                <div className="flex-shrink-0">
-                    <FlowDispatcher energy={energy} setEnergy={setEnergy} />
+                {/* RIGHT: Inbox / Miscellaneous Sidebar */}
+                <div className="w-80 flex-shrink-0 flex flex-col gap-4 glass-panel rounded-2xl bg-black/20 p-4 border border-white/5">
+                    <div className="flex items-center justify-between px-1">
+                        <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.2em]">Quick Tasks</span>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/20 -mx-2 px-2">
+                        {/* We reuse ProjectColumn but force specific styling for Inbox */}
+                        <div className="mb-0">
+                            <ProjectColumn
+                                key={inboxProject.id}
+                                project={inboxProject}
+                                editingProjectId={null}
+                                editProjectName=""
+                                onStartEdit={() => { }}
+                                onSaveName={() => { }}
+                                onSetEditName={() => { }}
+                                onDeleteProject={() => { }}
+                                onToggleTask={toggleTask}
+                                onDeleteTask={deleteTask}
+                                onMoveTask={moveTask}
+                            />
+                        </div>
+                    </div>
+
+                    {/* System Status / Flow Dispatcher - Moves to Right Column Bottom */}
+                    <div className="mt-auto">
+                        <FlowDispatcher energy={energy} setEnergy={setEnergy} />
+                    </div>
                 </div>
+
             </div>
         </DndProvider>
     );

@@ -9,6 +9,7 @@ import { SonicScapes } from './components/modules/SonicScapes';
 import { TemporalView } from './components/modules/TemporalView';
 import { Settings } from './components/modules/Settings';
 import { useSonic } from './hooks/useSonic';
+import { WALLPAPERS } from './constants';
 import type { EnergyState } from './components/modules/FlowDispatcher';
 import type { Project, SystemSettings } from './types';
 
@@ -23,12 +24,22 @@ function App() {
   const sonicState = useSonic(); // Initialize audio engine
 
   // System Settings
-  const [settings, setSettings] = useState<SystemSettings>({
-    glassBlur: 16,
-    wallpaper: `radial-gradient(at 0% 0%, rgba(103, 232, 249, 0.7) 0, transparent 50%),
+  const [settings, setSettings] = useState<SystemSettings>(() => {
+    const saved = localStorage.getItem('dreamOS_settings');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse settings", e);
+      }
+    }
+    return {
+      glassBlur: 16,
+      wallpaper: `radial-gradient(at 0% 0%, rgba(103, 232, 249, 0.7) 0, transparent 50%),
                 radial-gradient(at 50% 100%, rgba(15, 118, 110, 1) 0, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(45, 212, 191, 0.6) 0, transparent 50%)`,
-    theme: 'day'
+      theme: 'day'
+    };
   });
 
   // Apply Settings to CSS Variables
@@ -48,6 +59,8 @@ function App() {
       root.style.setProperty('--glass-rgb', '255, 255, 255');
     }
 
+    localStorage.setItem('dreamOS_settings', JSON.stringify(settings));
+
   }, [settings]);
 
   // Initialize projects from localStorage or default
@@ -55,7 +68,12 @@ function App() {
     const saved = localStorage.getItem('dreamOS_projects');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Ensure misc-inbox exists for legacy data
+        if (!parsed.find((p: Project) => p.id === 'misc-inbox')) {
+          return [...parsed, { id: 'misc-inbox', name: 'Inbox', tasks: [] }];
+        }
+        return parsed;
       } catch (e) {
         console.error("Failed to parse projects", e);
       }
@@ -74,6 +92,11 @@ function App() {
         tasks: [
           { id: '201', text: 'Code OTCA metapixel clock logic', completed: false }
         ]
+      },
+      {
+        id: 'misc-inbox',
+        name: 'Inbox',
+        tasks: []
       }
     ];
   });
@@ -118,7 +141,9 @@ function App() {
                 {activeView === 'projects' && (
                   <Projects energy={energy} setEnergy={setEnergy} projects={projects} setProjects={setProjects} />
                 )}
-                {activeView === 'theory' && <TheoryLab />}
+                {activeView === 'theory' && (
+                  <TheoryLab themeId={WALLPAPERS.find(w => w.value === settings.wallpaper)?.id || 'dream-teal'} />
+                )}
                 {activeView === 'library' && <Library />}
                 {activeView === 'sonic' && <SonicScapes {...sonicState} />}
                 {activeView === 'temporal' && <TemporalView projects={projects} setProjects={setProjects} />}
