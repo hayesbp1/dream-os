@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { UploadSimple, Brain, WarningCircle, CheckCircle, ArrowCounterClockwise, CaretDown, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
@@ -385,7 +385,7 @@ export function TheoryLab({ themeId = 'dream-teal' }: TheoryLabProps) {
     }, [currentMoveIndex]);
 
     // Right-click highlight state
-    const [rightClickedSquares, setRightClickedSquares] = useState<Record<string, { backgroundColor: string } | undefined>>({});
+    const [rightClickedSquares, setRightClickedSquares] = useState<Record<string, React.CSSProperties>>({});
 
     function onSquareRightClick(square: string) {
         const colour = 'rgba(255, 0, 0, 0.8)'; // More opacity
@@ -412,7 +412,6 @@ export function TheoryLab({ themeId = 'dream-teal' }: TheoryLabProps) {
         animationDurationInMs: 200,
         darkSquareStyle: { backgroundColor: colors.dark, backdropFilter: 'blur(4px)' },
         lightSquareStyle: { backgroundColor: colors.light, backdropFilter: 'blur(4px)' },
-        // @ts-ignore
         squareStyles: {
             ...rightClickedSquares,
             ...(lastMoveSource && { [lastMoveSource]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' } }),
